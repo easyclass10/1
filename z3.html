@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Presupuestos | Ecuador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A modular SPA with a persistent sidebar for navigation and a main content area. This task-oriented design replaces the linear report structure, allowing users to jump directly to concepts, interactive tools, or quizzes. The structure is chosen for usability, promoting non-linear exploration and hands-on learning over passive reading. Key interactions include live calculators for personal and corporate budgeting, interactive diagrams for processes, and a dynamic quiz for self-assessment. -->
+    <!-- Visualization & Content Choices: Report Info: Budgeting cycle -> Goal: Organize/Inform -> Viz: Interactive HTML/CSS diagram -> Interaction: Click-to-reveal details -> Justification: Visually reinforces the process flow. | Report Info: 50/30/20 rule -> Goal: Apply -> Viz: Chart.js Donut Chart -> Interaction: User input for income updates chart live -> Justification: Personalizes the concept. | Report Info: Corporate budget formulas -> Goal: Apply -> Viz: HTML forms as calculators -> Interaction: Live calculation on input -> Justification: Provides hands-on practice. | Report Info: MCQs -> Goal: Assess -> Viz: Interactive Quiz UI -> Interaction: Immediate feedback on answer selection -> Justification: Enhances learning and retention. All visualizations are built with HTML/CSS or Chart.js (Canvas). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfcfb;
+            color: #44403c;
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #f97316;
+            color: white;
+            font-weight: 600;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #fdba74;
+            color: #44403c;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .quiz-option {
+            transition: background-color 0.2s;
+        }
+        .quiz-option.correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <aside class="w-full md:w-64 bg-stone-100 border-r border-stone-200 p-4 md:p-6 sticky top-0 md:h-screen">
+            <h1 class="text-2xl font-bold text-orange-600 mb-6">Guía de Presupuestos</h1>
+            <nav id="main-nav" class="flex flex-row md:flex-col gap-2">
+                <a href="#fundamentos" class="nav-link p-3 rounded-lg text-sm font-medium active" data-target="fundamentos">Fundamentos</a>
+                <a href="#clasificacion" class="nav-link p-3 rounded-lg text-sm font-medium" data-target="clasificacion">Clasificación</a>
+                <a href="#personal" class="nav-link p-3 rounded-lg text-sm font-medium" data-target="personal">Presupuesto Personal</a>
+                <a href="#corporativo" class="nav-link p-3 rounded-lg text-sm font-medium" data-target="corporativo">Presupuesto Corporativo</a>
+                <a href="#herramientas" class="nav-link p-3 rounded-lg text-sm font-medium" data-target="herramientas">Herramientas</a>
+                <a href="#autoevaluacion" class="nav-link p-3 rounded-lg text-sm font-medium" data-target="autoevaluacion">Autoevaluación</a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+            
+            <section id="fundamentos" class="content-section active">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Principios Fundamentales de la Presupuestación</h2>
+                <p class="mb-8 text-stone-600">Un presupuesto es más que un ejercicio contable; es la traducción de la estrategia de una organización en un plan cuantitativo. Esta sección explora los conceptos clave que sustentan un proceso de presupuestación eficaz, desde sus funciones gerenciales hasta su naturaleza cíclica.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-semibold text-orange-600 mb-3">Los Cuatro Pilares del Presupuesto</h3>
+                        <p class="text-stone-600 mb-4">El presupuesto cumple cuatro funciones gerenciales interconectadas que son críticas para el éxito de cualquier organización.</p>
+                        <ul class="space-y-3 text-stone-700">
+                            <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">➔</span><strong>Planificación:</strong> Formaliza la visión a futuro, estableciendo metas claras y anticipando cambios en el entorno.</li>
+                            <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">➔</span><strong>Control:</strong> Proporciona un estándar para medir el desempeño real, identificar desviaciones y tomar acciones correctivas.</li>
+                            <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">➔</span><strong>Coordinación y Comunicación:</strong> Alinea a todos los departamentos hacia objetivos comunes, asegurando que las metas sean consistentes.</li>
+                            <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">➔</span><strong>Motivación:</strong> Incentiva a los empleados a alcanzar metas desafiantes pero realistas, fomentando la responsabilidad.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-semibold text-orange-600 mb-3">El Ciclo Presupuestario</h3>
+                        <p class="text-stone-600 mb-4">La presupuestación es un proceso continuo de mejora. Haga clic en cada fase para ver su descripción.</p>
+                        <div id="cycle-diagram" class="space-y-2">
+                            <div class="cycle-step p-3 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50" data-desc="La alta dirección define los objetivos estratégicos para el próximo período (ej. aumentar la participación de mercado, lanzar un nuevo producto).">1. Establecimiento de Objetivos</div>
+                            <div class="cycle-step p-3 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50" data-desc="Se desarrollan pronósticos, especialmente el de ventas, que servirán como base para el presupuesto.">2. Pronóstico</div>
+                            <div class="cycle-step p-3 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50" data-desc="Cada departamento prepara su presupuesto operativo, que luego se consolida en el presupuesto maestro.">3. Formulación</div>
+                            <div class="cycle-step p-3 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50" data-desc="El presupuesto maestro es revisado, ajustado y finalmente aprobado por la alta dirección.">4. Aprobación</div>
+                            <div class="cycle-step p-3 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50" data-desc="El presupuesto se implementa y se compara el desempeño real con las cifras presupuestadas de forma continua.">5. Ejecución y Monitoreo</div>
+                            <div class="cycle-step p-3 border border-stone-200 rounded-lg cursor-pointer hover:bg-stone-50" data-desc="Al final del período, se analizan las variaciones y las lecciones aprendidas se utilizan para el siguiente ciclo.">6. Evaluación y Retroalimentación</div>
+                        </div>
+                        <p id="cycle-desc" class="mt-4 text-stone-600 bg-stone-100 p-4 rounded-lg min-h-[50px]"></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="clasificacion" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Clasificación de los Presupuestos</h2>
+                <p class="mb-8 text-stone-600">Los presupuestos se clasifican según diferentes criterios para satisfacer diversas necesidades de planificación y control. Explore las categorías para entender qué tipo de presupuesto es más adecuado para cada situación.</p>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <table class="w-full text-left">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                <th class="p-4 font-semibold text-stone-700">Criterio</th>
+                                <th class="p-4 font-semibold text-stone-700">Tipo de Presupuesto</th>
+                                <th class="p-4 font-semibold text-stone-700">Descripción Principal</th>
+                                <th class="p-4 font-semibold text-stone-700">Uso Principal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-stone-200">
+                                <td class="p-4 font-medium text-orange-600" rowspan="2">Flexibilidad</td>
+                                <td class="p-4">Estático / Fijo</td>
+                                <td class="p-4 text-stone-600">Basado en un solo nivel de actividad.</td>
+                                <td class="p-4 text-stone-600">Planificación inicial, control de áreas con costos fijos.</td>
+                            </tr>
+                            <tr class="border-b border-stone-200">
+                                <td class="p-4">Flexible</td>
+                                <td class="p-4 text-stone-600">Se ajusta al nivel de actividad real.</td>
+                                <td class="p-4 text-stone-600">Control de costos y evaluación de desempeño en áreas operativas.</td>
+                            </tr>
+                            <tr class="border-b border-stone-200">
+                                <td class="p-4 font-medium text-orange-600" rowspan="2">Período</td>
+                                <td class="p-4">Corto Plazo</td>
+                                <td class="p-4 text-stone-600">Usualmente un año.</td>
+                                <td class="p-4 text-stone-600">Gestión de operaciones diarias.</td>
+                            </tr>
+                            <tr class="border-b border-stone-200">
+                                <td class="p-4">Largo Plazo</td>
+                                <td class="p-4 text-stone-600">Varios años (3-10).</td>
+                                <td class="p-4 text-stone-600">Planificación de inversiones estratégicas y de capital.</td>
+                            </tr>
+                             <tr class="border-b border-stone-200">
+                                <td class="p-4 font-medium text-orange-600" rowspan="2">Función</td>
+                                <td class="p-4">De Operación</td>
+                                <td class="p-4 text-stone-600">Relacionado con ingresos y gastos operativos.</td>
+                                <td class="p-4 text-stone-600">Proyectar el Estado de Resultados.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4">Financiero</td>
+                                <td class="p-4 text-stone-600">Relacionado con efectivo y posición financiera.</td>
+                                <td class="p-4 text-stone-600">Proyectar el Flujo de Caja y el Balance General.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="personal" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Presupuesto Personal y Familiar</h2>
+                <p class="mb-8 text-stone-600">Los principios de presupuestación son esenciales para la salud financiera de un hogar. Un presupuesto familiar permite tomar control del dinero y trabajar hacia metas financieras. Una herramienta popular es la regla 50/30/20, que distribuye los ingresos netos en necesidades, deseos y ahorros.</p>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-semibold text-orange-600 mb-4 text-center">Calculadora Interactiva: Regla 50/30/20</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <label for="ingresoMensual" class="block text-sm font-medium text-stone-700 mb-2">Ingrese su Ingreso Neto Mensual (USD):</label>
+                            <input type="number" id="ingresoMensual" class="w-full p-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Ej: 1200">
+                            <div class="mt-6 space-y-3">
+                                <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                                    <span class="font-semibold text-blue-800">50% Necesidades:</span>
+                                    <span id="necesidades-valor" class="font-bold text-blue-800">$0.00</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                                    <span class="font-semibold text-purple-800">30% Deseos:</span>
+                                    <span id="deseos-valor" class="font-bold text-purple-800">$0.00</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                                    <span class="font-semibold text-green-800">20% Ahorro y Deudas:</span>
+                                    <span id="ahorro-valor" class="font-bold text-green-800">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="personalBudgetChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="corporativo" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Presupuesto Corporativo: El Plan Operativo</h2>
+                <p class="mb-8 text-stone-600">El presupuesto maestro de una empresa es una red de presupuestos individuales que sigue una secuencia lógica. El proceso comienza con el presupuesto de ventas, que determina el nivel de actividad para todas las demás áreas, como producción y compras.</p>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-semibold text-orange-600 mb-3">Secuencia del Presupuesto de Operación</h3>
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p class="font-bold">1. Ppto. de Ventas</p>
+                            <p class="text-xs text-stone-500">Punto de partida</p>
+                        </div>
+                        <div class="text-2xl text-orange-500 font-light">→</div>
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p class="font-bold">2. Ppto. de Producción</p>
+                            <p class="text-xs text-stone-500">¿Cuánto fabricar?</p>
+                        </div>
+                        <div class="text-2xl text-orange-500 font-light">→</div>
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p class="font-bold">3. Pptos. de Costos</p>
+                            <p class="text-xs text-stone-500">MP, MOD, CIF</p>
+                        </div>
+                         <div class="text-2xl text-orange-500 font-light">→</div>
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p class="font-bold">4. Estado de Resultados</p>
+                            <p class="text-xs text-stone-500">Resultado final</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="herramientas" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Herramientas Interactivas</h2>
+                <p class="mb-8 text-stone-600">Utilice estas calculadoras para aplicar los conceptos clave de la presupuestación corporativa. Ingrese sus propios datos para ver cómo las fórmulas funcionan en la práctica y cómo los diferentes componentes del presupuesto se interconectan.</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-semibold text-orange-600 mb-4">Calculadora de Unidades a Producir</h3>
+                        <p class="text-sm text-stone-600 mb-4">Determine cuántas unidades debe producir una empresa para satisfacer la demanda y mantener su política de inventarios.</p>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="ventasUnidades" class="block text-sm font-medium text-stone-700">Ventas Presupuestadas (unidades)</label>
+                                <input type="number" id="ventasUnidades" class="mt-1 w-full p-2 border border-stone-300 rounded-md">
+                            </div>
+                            <div>
+                                <label for="invFinal" class="block text-sm font-medium text-stone-700">Inventario Final Deseado (unidades)</label>
+                                <input type="number" id="invFinal" class="mt-1 w-full p-2 border border-stone-300 rounded-md">
+                            </div>
+                            <div>
+                                <label for="invInicial" class="block text-sm font-medium text-stone-700">Inventario Inicial (unidades)</label>
+                                <input type="number" id="invInicial" class="mt-1 w-full p-2 border border-stone-300 rounded-md">
+                            </div>
+                        </div>
+                        <div class="mt-5 text-center p-4 bg-amber-50 rounded-lg">
+                            <p class="text-stone-700">Unidades a Producir:</p>
+                            <p id="unidadesProducir" class="text-2xl font-bold text-orange-600">0</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-semibold text-orange-600 mb-4">Calculadora de Utilidad Neta (Ecuador)</h3>
+                        <p class="text-sm text-stone-600 mb-4">Calcule la utilidad neta final a partir de la utilidad contable, aplicando las deducciones de ley en Ecuador (15% participación de trabajadores y 25% impuesto a la renta).</p>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="utilidadContable" class="block text-sm font-medium text-stone-700">Utilidad Contable (antes de part. e impuestos)</label>
+                                <input type="number" id="utilidadContable" class="mt-1 w-full p-2 border border-stone-300 rounded-md">
+                            </div>
+                        </div>
+                        <div class="mt-5 space-y-2">
+                             <div class="flex justify-between items-center p-2 bg-stone-50 rounded-md">
+                                <span>(-) 15% Part. Trabajadores:</span>
+                                <span id="partTrabajadores" class="font-semibold">$0.00</span>
+                            </div>
+                             <div class="flex justify-between items-center p-2 bg-stone-50 rounded-md">
+                                <span>(=) Base Imponible:</span>
+                                <span id="baseImponible" class="font-semibold">$0.00</span>
+                            </div>
+                             <div class="flex justify-between items-center p-2 bg-stone-50 rounded-md">
+                                <span>(-) 25% Impuesto a la Renta:</span>
+                                <span id="impRenta" class="font-semibold">$0.00</span>
+                            </div>
+                             <div class="flex justify-between items-center p-4 bg-amber-50 rounded-lg mt-2">
+                                <span class="font-bold text-orange-700">(=) Utilidad Neta:</span>
+                                <span id="utilidadNeta" class="text-2xl font-bold text-orange-600">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="autoevaluacion" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Autoevaluación</h2>
+                <p class="mb-8 text-stone-600">Ponga a prueba sus conocimientos. Seleccione un tema y responda las preguntas para verificar su comprensión de los conceptos clave de la presupuestación.</p>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                        <div class="w-full sm:w-auto mb-4 sm:mb-0">
+                            <label for="quiz-topic" class="mr-2 font-medium">Seleccione un tema:</label>
+                            <select id="quiz-topic" class="p-2 border border-stone-300 rounded-lg">
+                                <option value="1">1. Conceptos y Generalidades</option>
+                                <option value="2">2. Clasificación de Presupuestos</option>
+                                <option value="3">3. Presupuesto Personal</option>
+                                <option value="4">4. Presupuesto Corporativo</option>
+                            </select>
+                        </div>
+                        <div id="quiz-navigation" class="flex items-center gap-2">
+                             <button id="prev-question" class="py-2 px-4 bg-stone-200 hover:bg-stone-300 rounded-lg text-sm">Anterior</button>
+                             <span id="question-counter" class="text-sm font-medium text-stone-600"></span>
+                             <button id="next-question" class="py-2 px-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm">Siguiente</button>
+                        </div>
+                    </div>
+                    <div id="quiz-container">
+                        <p id="quiz-question" class="text-lg font-semibold text-stone-800 mb-4"></p>
+                        <div id="quiz-options" class="space-y-3"></div>
+                        <div id="quiz-feedback" class="mt-4 p-4 rounded-lg text-sm hidden"></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const navLinks = document.querySelectorAll('#main-nav a');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function updateActiveContent(targetId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.target === targetId);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.currentTarget.dataset.target;
+                    updateActiveContent(targetId);
+                    window.location.hash = targetId;
+                });
+            });
+
+            const initialHash = window.location.hash.substring(1);
+            if (initialHash) {
+                updateActiveContent(initialHash);
+            } else {
+                updateActiveContent('fundamentos');
+            }
+            
+            const cycleSteps = document.querySelectorAll('.cycle-step');
+            const cycleDesc = document.getElementById('cycle-desc');
+            cycleSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    cycleDesc.textContent = step.dataset.desc;
+                    cycleSteps.forEach(s => s.classList.remove('bg-amber-100'));
+                    step.classList.add('bg-amber-100');
+                });
+            });
+
+            const ingresoMensualInput = document.getElementById('ingresoMensual');
+            const necesidadesValor = document.getElementById('necesidades-valor');
+            const deseosValor = document.getElementById('deseos-valor');
+            const ahorroValor = document.getElementById('ahorro-valor');
+            let personalBudgetChart;
+
+            function updatePersonalBudget() {
+                const ingreso = parseFloat(ingresoMensualInput.value) || 0;
+                const necesidades = ingreso * 0.5;
+                const deseos = ingreso * 0.3;
+                const ahorro = ingreso * 0.2;
+
+                necesidadesValor.textContent = `$${necesidades.toFixed(2)}`;
+                deseosValor.textContent = `$${deseos.toFixed(2)}`;
+                ahorroValor.textContent = `$${ahorro.toFixed(2)}`;
+
+                const chartData = [necesidades, deseos, ahorro];
+                if (personalBudgetChart) {
+                    personalBudgetChart.data.datasets[0].data = chartData;
+                    personalBudgetChart.update();
+                }
+            }
+
+            ingresoMensualInput.addEventListener('input', updatePersonalBudget);
+            
+            const ctx = document.getElementById('personalBudgetChart').getContext('2d');
+            personalBudgetChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['50% Necesidades', '30% Deseos', '20% Ahorro y Deudas'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#22c55e'],
+                        borderColor: '#fdfcfb',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += new Intl.NumberFormat('es-EC', { style: 'currency', currency: 'USD' }).format(context.parsed);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ventasUnidadesInput = document.getElementById('ventasUnidades');
+            const invFinalInput = document.getElementById('invFinal');
+            const invInicialInput = document.getElementById('invInicial');
+            const unidadesProducirOutput = document.getElementById('unidadesProducir');
+
+            function calcularUnidadesProducir() {
+                const ventas = parseFloat(ventasUnidadesInput.value) || 0;
+                const invFinal = parseFloat(invFinalInput.value) || 0;
+                const invInicial = parseFloat(invInicialInput.value) || 0;
+                const resultado = ventas + invFinal - invInicial;
+                unidadesProducirOutput.textContent = resultado.toLocaleString('es-EC');
+            }
+
+            [ventasUnidadesInput, invFinalInput, invInicialInput].forEach(input => {
+                input.addEventListener('input', calcularUnidadesProducir);
+            });
+
+            const utilidadContableInput = document.getElementById('utilidadContable');
+            const partTrabajadoresOutput = document.getElementById('partTrabajadores');
+            const baseImponibleOutput = document.getElementById('baseImponible');
+            const impRentaOutput = document.getElementById('impRenta');
+            const utilidadNetaOutput = document.getElementById('utilidadNeta');
+
+            function calcularUtilidadNeta() {
+                const utilidadContable = parseFloat(utilidadContableInput.value) || 0;
+                const partTrabajadores = utilidadContable * 0.15;
+                const baseImponible = utilidadContable - partTrabajadores;
+                const impRenta = baseImponible * 0.25;
+                const utilidadNeta = baseImponible - impRenta;
+
+                partTrabajadoresOutput.textContent = `$${partTrabajadores.toFixed(2)}`;
+                baseImponibleOutput.textContent = `$${baseImponible.toFixed(2)}`;
+                impRentaOutput.textContent = `$${impRenta.toFixed(2)}`;
+                utilidadNetaOutput.textContent = `$${utilidadNeta.toFixed(2)}`;
+            }
+            
+            utilidadContableInput.addEventListener('input', calcularUtilidadNeta);
+
+            const quizData = {
+                "1": [
+                    { q: "Una empresa establece en su presupuesto el objetivo de reducir costos de producción en un 5% mediante una nueva tecnología. ¿Qué función principal del presupuesto se destaca?", o: ["Coordinación", "Planificación Estratégica", "Control", "Comunicación"], a: 1, exp: "La acción de presupuestar recursos para una nueva tecnología con el fin de alcanzar una meta de reducción de costos a largo plazo es un claro ejemplo de planificación estratégica." },
+                    { q: "Al comparar los $25,000 gastados en publicidad con los $20,000 presupuestados, un gerente analiza la desviación. Este proceso es un ejemplo de la función de:", o: ["Motivación", "Planificación", "Control", "Coordinación"], a: 2, exp: "El acto de comparar los resultados reales con el estándar presupuestado y analizar las causas de la diferencia es la esencia de la función de control." }
+                ],
+                "2": [
+                    { q: "Una empresa manufacturera tuvo una producción 15% superior a la planeada. ¿Qué tipo de presupuesto es más adecuado para evaluar la eficiencia del gerente de producción?", o: ["Presupuesto Estático", "Presupuesto de Capital", "Presupuesto Flexible", "Presupuesto de Efectivo"], a: 2, exp: "Un presupuesto flexible se ajusta al nivel de producción real, permitiendo una comparación justa de los costos incurridos." },
+                    { q: "¿Cuál es la piedra angular del presupuesto de operación y generalmente se prepara primero?", o: ["Presupuesto de Producción", "Presupuesto de Ventas", "Presupuesto de Efectivo", "Presupuesto de Compras"], a: 1, exp: "El presupuesto de ventas es el punto de partida, ya que el nivel de ventas proyectado determina el nivel de actividad de toda la empresa." }
+                ],
+                "3": [
+                    { q: "Según la regla 50/30/20, una persona con un ingreso neto de $1,200 debería destinar aproximadamente al ahorro y pago de deudas la cantidad de:", o: ["$600", "$360", "$240", "$120"], a: 2, exp: "El 20% de $1,200 es (1200 * 0.20), lo que equivale a $240." },
+                    { q: "El pago mensual de la alícuota de un condominio y la cuota de un préstamo hipotecario se clasifican como:", o: ["Gastos Variables Necesarios", "Gastos Discrecionales", "Gastos Fijos Obligatorios", "Inversiones"], a: 2, exp: "Son gastos recurrentes, de monto predecible y de carácter obligatorio, por lo que encajan en la categoría de gastos fijos obligatorios." }
+                ],
+                "4": [
+                    { q: "Una empresa planea vender 20,000 unidades. Tiene 3,000 en inventario inicial y desea un inventario final de 4,000. ¿Cuántas unidades debe producir?", o: ["20,000", "21,000", "19,000", "27,000"], a: 1, exp: "Unidades a Producir = Ventas + Inv. Final - Inv. Inicial. Cálculo: 20,000 + 4,000 - 3,000 = 21,000 unidades." },
+                    { q: "La secuencia lógica para elaborar los presupuestos de operación es:", o: ["Producción -> Ventas -> Compras", "Ventas -> Producción -> Compras", "Compras -> Producción -> Ventas", "Ventas -> Compras -> Producción"], a: 1, exp: "La planificación comienza con la demanda (Ventas), que determina cuánto fabricar (Producción), y eso define qué insumos adquirir (Compras)." }
+                ]
+            };
+
+            const quizTopicSelect = document.getElementById('quiz-topic');
+            const questionEl = document.getElementById('quiz-question');
+            const optionsEl = document.getElementById('quiz-options');
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const prevBtn = document.getElementById('prev-question');
+            const nextBtn = document.getElementById('next-question');
+            const counterEl = document.getElementById('question-counter');
+
+            let currentTopic = '1';
+            let currentQuestionIndex = 0;
+            let questions = [];
+
+            function loadQuiz() {
+                questions = quizData[currentTopic];
+                currentQuestionIndex = 0;
+                displayQuestion();
+            }
+
+            function displayQuestion() {
+                const questionData = questions[currentQuestionIndex];
+                questionEl.textContent = questionData.q;
+                optionsEl.innerHTML = '';
+                feedbackEl.classList.add('hidden');
+                
+                questionData.o.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.className = 'quiz-option block w-full text-left p-3 border border-stone-300 rounded-lg hover:bg-stone-100';
+                    button.dataset.index = index;
+                    optionsEl.appendChild(button);
+                });
+
+                counterEl.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
+                prevBtn.disabled = currentQuestionIndex === 0;
+                nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+            }
+
+            optionsEl.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const selectedIndex = parseInt(e.target.dataset.index);
+                    const correctIndex = questions[currentQuestionIndex].a;
+                    
+                    Array.from(optionsEl.children).forEach((btn, index) => {
+                        btn.disabled = true;
+                        if (index === correctIndex) {
+                            btn.classList.add('correct');
+                        } else if (index === selectedIndex) {
+                            btn.classList.add('incorrect');
+                        }
+                    });
+
+                    feedbackEl.textContent = `Explicación: ${questions[currentQuestionIndex].exp}`;
+                    feedbackEl.classList.remove('hidden');
+                }
+            });
+
+            quizTopicSelect.addEventListener('change', (e) => {
+                currentTopic = e.target.value;
+                loadQuiz();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    displayQuestion();
+                }
+            });
+
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>
